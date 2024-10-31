@@ -45,6 +45,7 @@ WITH eventos AS (
            'BA 1.1 - Distribuição da ação',
            'Monitória 1.4 - Ajuizamento',
            'Cobrança 1.4 - Ajuizamento',
+           'CS 1.2 - Iniciado o cumprimento de sentença',
 
            'BA 2.1 - Deferida liminar de BA/RP',
 
@@ -169,7 +170,7 @@ WITH eventos AS (
            'Sentença Extinção da Busca e Apreensão'
 
 
-        ) OR h.F00162 IN ('Inicial', 'Irrecuperabilidade','Pré-ajuizamento', 'Suspenso') OR aa.F00156 = 'Pré-ajuizamento') AND f.F25017 = 1
+        ) OR h.F00162 IN ('Inicial', 'Irrecuperabilidade','Pré-ajuizamento', 'Suspenso') OR aa.F00156 = 'Pré-ajuizamento') AND f.F25017 = 1 AND h.F00162 NOT LIKE 'FL%' AND h.F00162 NOT LIKE 'RJ%'
 ),
 sub AS (
     SELECT
@@ -236,7 +237,7 @@ SELECT
 
         WHEN ultimo_evento IN ('Sentença de Extinção da Execução', 'Sentença Extinção da Busca e Apreensão') THEN 'Proc. Extinto'
 
-        WHEN ultimo_evento IN ('Execução 1.1 - Data distribuição da ação','BA 1.1 - Distribuição da ação','Monitória 1.4 - Ajuizamento','Cobrança 1.4 - Ajuizamento') THEN 'Ação Distribuida'
+        WHEN ultimo_evento IN ('Execução 1.1 - Data distribuição da ação','BA 1.1 - Distribuição da ação','Monitória 1.4 - Ajuizamento','Cobrança 1.4 - Ajuizamento', 'CS 1.2 - Iniciado o cumprimento de sentença') THEN 'Ação Distribuida'
 
         WHEN ultimo_evento = 'BA 2.1 - Deferida liminar de BA/RP' THEN 'Liminar Deferida'
 
@@ -293,10 +294,12 @@ SELECT DISTINCT
     pr.F14474 AS dossie,
     MAX(pr.F25017) AS situacao,
     MAX(ct.F01130) AS carteira,
-    MAX(fa.F00162) AS fase
+    MAX(fa.F00162) AS fase,
+    MAX(i.F00091) AS advogado_interno
 FROM [ramaprod].[dbo].T00041 AS pr
 LEFT JOIN [ramaprod].[dbo].T00035 AS ct ON pr.F01187 = ct.ID
 LEFT JOIN [ramaprod].[dbo].T00037 AS fa ON pr.F00177 = fa.ID
+LEFT JOIN [ramaprod].[dbo].T00030 AS i ON pr.F11578 = i.ID
 WHERE 
     pr.F14474 IS NOT NULL AND
     pr.F14474 NOT IN (SELECT dossie_max FROM consulta)
@@ -305,4 +308,4 @@ HAVING
     MAX(pr.F25017) = 1 AND
     MAX(ct.F01130) IN ('E1', 'E2', 'Créditos Especiais - Special Credits', 'Diligência Varejo Massificado', 'PF', 'Massificado PJ', 'PF - PROJETO PILOTO', 'Autos Santander', 'Alto Ticket', 
         'Insolvência Civil', 'Governos e Instituições') AND
-    MAX(fa.F00162) <> 'Acordo'
+    MAX(fa.F00162) <> 'Acordo' AND MAX(fa.F00162) NOT LIKE 'FL%' AND MAX(fa.F00162) NOT LIKE 'RJ%'

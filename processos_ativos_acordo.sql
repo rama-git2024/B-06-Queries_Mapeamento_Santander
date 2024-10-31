@@ -1,18 +1,18 @@
 SELECT
-        a.F04461 AS pasta,
-        MAX(d.F14474) AS dossie,
-        MAX(e.F01062) AS criado_em,
-        MAX(
-        CASE
-                WHEN f.F25017 = 1 THEN 'Ativo'
-                WHEN f.F25017 = 2 THEN 'Encerrado'
-                WHEN f.F25017 = 3 THEN 'Acordo'
-                WHEN f.F25017 = 4 THEN 'Em encerramento'
-                ELSE 'Em precatório (Ativo)'
-        END)  AS situacao,
-        MAX(aa.F00156) AS tipo_acao,
-        MAX(m.F01130) AS carteira,
-        MAX(h.F00162) AS fase
+     a.F04461 AS pasta,
+     MAX(d.F14474) AS dossie,
+     MAX(e.F01062) AS criado_em,
+     MAX(
+          CASE
+               WHEN f.F25017 = 1 THEN 'Ativo'
+               WHEN f.F25017 = 2 THEN 'Encerrado'
+               WHEN f.F25017 = 3 THEN 'Acordo'
+               WHEN f.F25017 = 4 THEN 'Em encerramento'
+               ELSE 'Em precatório (Ativo)'
+          END)  AS situacao,
+     MAX(aa.F00156) AS tipo_acao,
+     MAX(m.F01130) AS carteira,
+     MAX(h.F00162) AS fase
 FROM [ramaprod].[dbo].T00069 AS a
 LEFT JOIN [ramaprod].[dbo].T00003 AS b ON a.F08501 = b.ID
 LEFT JOIN [ramaprod].[dbo].T00064 AS c ON a.F01133 = c.ID
@@ -41,13 +41,13 @@ LEFT JOIN [ramaprod].[dbo].T02677 AS y ON d.F43646 = y.ID
 LEFT JOIN [ramaprod].[dbo].T00034 AS aa ON d.F01122 = aa.ID
 GROUP BY a.F04461
 HAVING
-        MAX(
-        CASE
-                WHEN f.F25017 = 1 THEN 'Ativo'
-                WHEN f.F25017 = 2 THEN 'Encerrado'
-                WHEN f.F25017 = 3 THEN 'Acordo'
-                WHEN f.F25017 = 4 THEN 'Em encerramento'
-                ELSE 'Em precatório (Ativo)'
-        END) = 'Ativo' AND
-        MAX(h.F00162) = 'Acordo'
+     MAX(
+          CASE
+               WHEN f.F25017 = 1 THEN 'Ativo'
+               WHEN f.F25017 = 2 THEN 'Encerrado'
+               WHEN f.F25017 = 3 THEN 'Acordo'
+               WHEN f.F25017 = 4 THEN 'Em encerramento'
+               ELSE 'Em precatório (Ativo)'
+          END) = 'Ativo' AND
+     MAX(h.F00162) = 'Acordo'
 ORDER BY criado_em DESC;
